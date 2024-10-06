@@ -1,2 +1,2 @@
 # M-ResGAT
-Boosting ResGAT for Paper Classification with Hierarchical Multi-hop Attention
+Boosting ResGAT for Node Classification of Citation Network with Multi-hop \& Motif-Based Attention
