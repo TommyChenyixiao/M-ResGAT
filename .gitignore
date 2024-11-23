@@ -6,6 +6,11 @@ __pycache__/
 # C extensions
 *.so
 
+# model log & checkpoint
+cora_ml/
+outputs/models/
+outputs/results/
+
 # Distribution / packaging
 .Python
 build/
