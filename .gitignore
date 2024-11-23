@@ -9,7 +9,7 @@ __pycache__/
 # model log & checkpoint
 cora_ml/
 outputs/models/
-outputs/results/
+*.json
 
 # Distribution / packaging
 .Python
