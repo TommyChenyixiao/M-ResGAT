@@ -1,4 +1,3 @@
-# train.py
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
@@ -17,7 +16,10 @@ from models.graphsage import GraphSAGE
 from models.gat import GAT
 from models.resgat import ResGAT
 from models.multihop_resgat import MultiHopResGAT
+from models.mgat import MGAT
+from models.multihop_mgat import MultiHopMGAT
 from utils.metrics import evaluate, plot_roc_curves
+
 class Config:
     # General settings
     SEED = 42
@@ -40,7 +42,8 @@ class Config:
             'gat_heads': 8,
             'num_layers': 3,
             'num_hops': 2,
-            'combine_method': 'attention'
+            'combine_method': 'attention',
+            'beta': 0.5  # Balance between first-order and motif attention
         },
         'Cora': {
             'hidden_channels': 256,
@@ -50,17 +53,19 @@ class Config:
             'gat_heads': 8,
             'num_layers': 3,
             'num_hops': 2,
-            'combine_method': 'attention'
+            'combine_method': 'attention',
+            'beta': 0.5
         },
         'CiteSeer': {
             'hidden_channels': 256,
-            'dropout': 0.4,
+            'dropout': 0.3,
             'learning_rate': 0.001,
             'weight_decay': 1e-4,
             'gat_heads': 8,
             'num_layers': 3,
             'num_hops': 2,
-            'combine_method': 'attention'
+            'combine_method': 'attention',
+            'beta': 0.5
         }
     }
     
@@ -93,7 +98,8 @@ class Config:
         self.GAT_HEADS = config['gat_heads']
         self.NUM_HOPS = config['num_hops']
         self.COMBINE_METHOD = config['combine_method']
-        
+        self.MGAT_BETA = config['beta']
+
         # Optimization parameters
         self.LEARNING_RATE = config['learning_rate']
         self.WEIGHT_DECAY = config['weight_decay']
@@ -119,6 +125,7 @@ class Config:
             f"    GAT Heads: {self.GAT_HEADS}\n"
             f"    Number of Hops: {self.NUM_HOPS}\n"
             f"    Combine Method: {self.COMBINE_METHOD}\n"
+            f"    MGAT Beta: {self.MGAT_BETA}\n"
             f"  Training Parameters:\n"
             f"    Learning Rate: {self.LEARNING_RATE}\n"
             f"    Weight Decay: {self.WEIGHT_DECAY}\n"
@@ -202,47 +209,66 @@ class TransductiveTrainer:
     def _initialize_models(self):
         """Initialize all model architectures"""
         self.models = {
-            'GCN': GCN(
-                self.stats['num_features'],
-                self.config.HIDDEN_CHANNELS,
-                self.stats['num_classes'],
-                num_layers=self.config.NUM_LAYERS,
-                dropout=self.config.DROPOUT
-            ),
-            'GraphSAGE': GraphSAGE(
-                self.stats['num_features'],
-                self.config.HIDDEN_CHANNELS,
-                self.stats['num_classes'],
-                num_layers=self.config.NUM_LAYERS,
-                dropout=self.config.DROPOUT
-            ),
-            'GAT': GAT(
-                self.stats['num_features'],
-                self.config.HIDDEN_CHANNELS,
-                self.stats['num_classes'],
-                num_layers=self.config.NUM_LAYERS,
-                heads=self.config.GAT_HEADS,
-                dropout=self.config.DROPOUT
-            ),
-            'ResGAT': ResGAT(
-                self.stats['num_features'],
-                self.config.HIDDEN_CHANNELS,
-                self.stats['num_classes'],
-                num_layers=self.config.NUM_LAYERS,
-                heads=self.config.GAT_HEADS,
-                dropout=self.config.DROPOUT,
-                residual=True
-            ),
-            'MultiHopResGAT': MultiHopResGAT(
-                self.stats['num_features'],
-                self.config.HIDDEN_CHANNELS,
-                self.stats['num_classes'],
-                num_layers=self.config.NUM_LAYERS,
-                heads=self.config.GAT_HEADS,
-                dropout=self.config.DROPOUT,
-                residual=True,
-                num_hops=self.config.NUM_HOPS,
-                combine=self.config.COMBINE_METHOD
+            # 'GCN': GCN(
+            #     self.stats['num_features'],
+            #     self.config.HIDDEN_CHANNELS,
+            #     self.stats['num_classes'],
+            #     num_layers=self.config.NUM_LAYERS,
+            #     dropout=self.config.DROPOUT
+            # ),
+            # 'GraphSAGE': GraphSAGE(
+            #     self.stats['num_features'],
+            #     self.config.HIDDEN_CHANNELS,
+            #     self.stats['num_classes'],
+            #     num_layers=self.config.NUM_LAYERS,
+            #     dropout=self.config.DROPOUT
+            # ),
+            # 'GAT': GAT(
+            #     self.stats['num_features'],
+            #     self.config.HIDDEN_CHANNELS,
+            #     self.stats['num_classes'],
+            #     num_layers=self.config.NUM_LAYERS,
+            #     heads=self.config.GAT_HEADS,
+            #     dropout=self.config.DROPOUT
+            # ),
+            # 'ResGAT': ResGAT(
+            #     self.stats['num_features'],
+            #     self.config.HIDDEN_CHANNELS,
+            #     self.stats['num_classes'],
+            #     num_layers=self.config.NUM_LAYERS,
+            #     heads=self.config.GAT_HEADS,
+            #     dropout=self.config.DROPOUT,
+            #     residual=True
+            # ),
+            # 'MultiHopResGAT': MultiHopResGAT(
+            #     self.stats['num_features'],
+            #     self.config.HIDDEN_CHANNELS,
+            #     self.stats['num_classes'],
+            #     num_layers=self.config.NUM_LAYERS,
+            #     heads=self.config.GAT_HEADS,
+            #     dropout=self.config.DROPOUT,
+            #     residual=True,
+            #     num_hops=self.config.NUM_HOPS,
+            #     combine=self.config.COMBINE_METHOD
+            # ),
+            # 'MGAT': MGAT(
+            # self.stats['num_features'],
+            # self.config.HIDDEN_CHANNELS,
+            # self.stats['num_classes'],
+            # num_layers=self.config.NUM_LAYERS,
+            # heads=self.config.GAT_HEADS,
+            # dropout=self.config.DROPOUT,
+            # beta=self.config.MGAT_BETA
+            # ),
+            'MultiHopMGAT': MultiHopMGAT(
+            self.stats['num_features'],
+            self.config.HIDDEN_CHANNELS,
+            self.stats['num_classes'],
+            num_layers=self.config.NUM_LAYERS,
+            heads=self.config.GAT_HEADS,
+            dropout=self.config.DROPOUT,
+            beta=self.config.MGAT_BETA,
+            num_hops=self.config.NUM_HOPS
             )
         }
         
@@ -341,7 +367,7 @@ class TransductiveTrainer:
                 print(f"Early stopping at epoch {epoch}")
                 break
             
-            if (epoch + 1) % 100 == 0:
+            if (epoch + 1) % 5 == 0:
                 print(f"Epoch {epoch+1:03d}: "
                       f"Loss = {train_loss:.4f}, "
                       f"Train Acc = {train_acc:.4f}, "
