@@ -5,6 +5,38 @@ from torch.nn import Linear, ModuleList, LayerNorm
 from torch_geometric.utils import add_self_loops, remove_self_loops
 
 class MultiHopResGATLayer(torch.nn.Module):
+    """Multi-hop Graph Attention Layer with Residual Connections.
+    
+    This layer extends GAT by incorporating:
+    1. Multi-hop attention aggregation
+    2. Residual connections with layer normalization
+    3. Flexible combination strategies for multi-hop outputs
+    
+    The layer processes the input graph at different hop distances and combines the 
+    results using either concatenation, summation, or learned attention weights.
+    
+    Args:
+        in_channels (int): Number of input features
+        out_channels (int): Number of output features
+        heads (int, optional): Number of attention heads. Defaults to 8
+        dropout (float, optional): Dropout probability. Defaults to 0.6
+        residual (bool, optional): Whether to use residual connection. Defaults to True
+        num_hops (int, optional): Number of hops to process. Defaults to 2
+        combine (str, optional): How to combine multi-hop outputs ['concat', 'sum', 'attention']. 
+            Defaults to 'concat'
+            
+    Attributes:
+        gat_layers (ModuleList): GAT layers for each hop
+        norm (LayerNorm): Layer normalization
+        attention (Linear): Attention weights for combining hops (if combine='attention')
+        res_linear (Linear): Transform for residual connection if dimensions differ
+        
+    Note:
+        - For 'concat' combination, out_channels is split evenly across hops
+        - Each hop uses independent GAT parameters
+        - Residual connections use layer normalization for stability
+        - Higher hops are computed by iteratively traversing the graph
+    """
     def __init__(self, in_channels, out_channels, heads=8, dropout=0.6, residual=True, 
                  num_hops=2, combine='concat'):
         super().__init__()
@@ -100,6 +132,39 @@ class MultiHopResGATLayer(torch.nn.Module):
         return next_edge_index
 
 class MultiHopResGAT(torch.nn.Module):
+    """Multi-hop Residual Graph Attention Network.
+    
+    This model stacks multiple MultiHopResGATLayers to create a deep architecture that:
+    1. Processes the graph at multiple hop distances
+    2. Uses residual connections and layer normalization
+    3. Combines multi-hop information flexibly
+    
+    The architecture consists of an input layer, multiple hidden layers with 
+    multi-hop processing, and a standard GAT output layer.
+    
+    Args:
+        num_features (int): Number of input features
+        hidden_channels (int): Number of hidden features
+        num_classes (int): Number of output classes
+        num_layers (int, optional): Number of model layers. Defaults to 3
+        heads (int, optional): Number of attention heads. Defaults to 8
+        dropout (float, optional): Dropout probability. Defaults to 0.6
+        residual (bool, optional): Whether to use residual connections. Defaults to True
+        num_hops (int, optional): Number of hops per layer. Defaults to 2
+        combine (str, optional): How to combine multi-hop outputs ['concat', 'sum', 'attention']. 
+            Defaults to 'concat'
+            
+    Attributes:
+        input_layer (MultiHopResGATLayer): Initial feature transformation layer
+        layers (ModuleList): List of hidden MultiHopResGATLayers
+        output_layer (GATConv): Final prediction layer
+        
+    Note:
+        - Input and hidden layers use multi-hop processing
+        - Each layer is followed by ELU activation and dropout
+        - Output layer uses standard single-hop GAT
+        - All hidden layers maintain the same dimension
+    """
     def __init__(self, num_features, hidden_channels, num_classes, num_layers=3, 
                  heads=8, dropout=0.6, residual=True, num_hops=2, combine='concat'):
         super().__init__()

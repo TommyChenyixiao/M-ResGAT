@@ -3,7 +3,34 @@ import torch.nn.functional as F
 from torch_geometric.nn import SAGEConv
 
 class GraphSAGE(torch.nn.Module):
+    """GraphSAGE implementation using PyTorch Geometric.
+
+    This model implements a multi-layer GraphSAGE architecture with configurable number of 
+    layers and dropout. GraphSAGE learns node embeddings by sampling and aggregating 
+    features from local neighborhoods. Each intermediate layer uses ReLU activation followed 
+    by dropout. The final layer produces raw logits without activation or dropout.
+    
+    Args:
+        num_features (int): Number of input features per node
+        hidden_channels (int): Number of hidden units in each layer
+        num_classes (int): Number of output classes
+        num_layers (int, optional): Number of GraphSAGE layers. Defaults to 2
+        dropout (float, optional): Dropout probability. Defaults to 0.5
+        
+    Attributes:
+        num_layers (int): Number of GraphSAGE layers
+        dropout (float): Dropout probability
+        convs (torch.nn.ModuleList): List of SAGEConv layers
+        
+    Note:
+        - Uses mean aggregation by default in SAGEConv layers
+        - All hidden layers use ReLU activation and dropout
+        - The output layer returns raw logits without activation or dropout
+        - The model uses the same number of hidden channels across all hidden layers
+        - Parameters can be reset using the reset_parameters() method
+    """
     def __init__(self, num_features, hidden_channels, num_classes, num_layers=2, dropout=0.5):
+
         super().__init__()
         
         self.num_layers = num_layers

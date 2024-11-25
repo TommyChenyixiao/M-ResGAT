@@ -5,9 +5,9 @@ import torch
 class DatasetHandler:
     AVAILABLE_DATASETS = {
         'Cora_ML': CitationFull,
-        'Cora': Planetoid,
-        'CiteSeer': Planetoid,
-        'PubMed': Planetoid,
+        'Cora': CitationFull,
+        'CiteSeer': CitationFull,
+        'PubMed': CitationFull,
     }
 
     def __init__(self, dataset_name, root='/tmp/CitationFull'):

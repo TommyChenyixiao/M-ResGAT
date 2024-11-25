@@ -3,6 +3,32 @@ import torch.nn.functional as F
 from torch_geometric.nn import GATConv
 
 class GAT(torch.nn.Module):
+    """Graph Attention Network (GAT) implementation using PyTorch Geometric.
+    
+    This model implements a multi-layer GAT architecture with configurable number of 
+    attention heads and dropout. Each intermediate layer uses ELU activation and 
+    concatenates the multi-head attention outputs. The final layer uses a single head
+    without concatenation.
+    
+    Args:
+        num_features (int): Number of input features per node
+        hidden_channels (int): Number of hidden units per head in each layer
+        num_classes (int): Number of output classes
+        num_layers (int, optional): Number of GAT layers. Defaults to 2
+        heads (int, optional): Number of attention heads. Defaults to 8
+        dropout (float, optional): Dropout probability. Defaults to 0.6
+        
+    Attributes:
+        num_layers (int): Number of GAT layers
+        dropout (float): Dropout probability
+        convs (torch.nn.ModuleList): List of GATConv layers
+        
+    Note:
+        - The hidden layer dimensions are multiplied by the number of heads due to concatenation
+        - Input features undergo dropout before the first layer
+        - All hidden layers use ELU activation and dropout
+        - The output layer uses a single attention head without concatenation
+    """
     def __init__(self, num_features, hidden_channels, num_classes, num_layers=2, 
                  heads=8, dropout=0.6):
         super().__init__()

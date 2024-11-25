@@ -7,6 +7,39 @@ from torch_geometric.utils import softmax, add_self_loops, remove_self_loops
 from torch_geometric.nn.inits import glorot, zeros
 
 class MotifGATConv(MessagePassing):
+    """Motif-based Graph Attention Network layer implementation.
+    
+    This layer extends the Graph Attention Network by incorporating motif-based 
+    structural attention along with traditional first-order attention. It uses a 
+    hybrid attention mechanism that combines node feature-based attention with 
+    higher-order structural patterns captured through motifs.
+    
+    Args:
+        in_channels (int): Size of input features per node
+        out_channels (int): Size of output features per node 
+        heads (int, optional): Number of attention heads. Defaults to 1
+        concat (bool, optional): Whether to concatenate or average multi-head outputs. Defaults to True
+        negative_slope (float, optional): LeakyReLU negative slope. Defaults to 0.2
+        dropout (float, optional): Dropout probability. Defaults to 0.0
+        add_self_loops (bool, optional): Whether to add self-loops to edge indices. Defaults to True
+        beta (float, optional): Weight balancing first-order and motif attention. Defaults to 0.5
+        bias (bool, optional): Whether to add bias. Defaults to True
+        residual (bool, optional): Whether to use residual connections. Defaults to True
+        **kwargs: Additional arguments for MessagePassing base class
+        
+    Attributes:
+        lin (Linear): Linear transformation for node features
+        att_src (Parameter): Source node attention parameters 
+        att_dst (Parameter): Target node attention parameters
+        res_linear (Linear): Optional transform for residual connections
+        
+    Note:
+        - Combines first-order node attention with motif-based structural attention
+        - Uses triangle motifs by default for structural pattern recognition
+        - Supports multi-head attention with optional concatenation
+        - Includes optional residual connections for deeper architectures
+        - Applies dropout to attention coefficients during training
+    """
     def __init__(
         self,
         in_channels: int,
