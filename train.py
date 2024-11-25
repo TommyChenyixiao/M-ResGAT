@@ -209,37 +209,37 @@ class TransductiveTrainer:
     def _initialize_models(self):
         """Initialize all model architectures"""
         self.models = {
-            # 'GCN': GCN(
-            #     self.stats['num_features'],
-            #     self.config.HIDDEN_CHANNELS,
-            #     self.stats['num_classes'],
-            #     num_layers=self.config.NUM_LAYERS,
-            #     dropout=self.config.DROPOUT
-            # ),
-            # 'GraphSAGE': GraphSAGE(
-            #     self.stats['num_features'],
-            #     self.config.HIDDEN_CHANNELS,
-            #     self.stats['num_classes'],
-            #     num_layers=self.config.NUM_LAYERS,
-            #     dropout=self.config.DROPOUT
-            # ),
-            # 'GAT': GAT(
-            #     self.stats['num_features'],
-            #     self.config.HIDDEN_CHANNELS,
-            #     self.stats['num_classes'],
-            #     num_layers=self.config.NUM_LAYERS,
-            #     heads=self.config.GAT_HEADS,
-            #     dropout=self.config.DROPOUT
-            # ),
-            # 'ResGAT': ResGAT(
-            #     self.stats['num_features'],
-            #     self.config.HIDDEN_CHANNELS,
-            #     self.stats['num_classes'],
-            #     num_layers=self.config.NUM_LAYERS,
-            #     heads=self.config.GAT_HEADS,
-            #     dropout=self.config.DROPOUT,
-            #     residual=True
-            # ),
+            'GCN': GCN(
+                self.stats['num_features'],
+                self.config.HIDDEN_CHANNELS,
+                self.stats['num_classes'],
+                num_layers=self.config.NUM_LAYERS,
+                dropout=self.config.DROPOUT
+            ),
+            'GraphSAGE': GraphSAGE(
+                self.stats['num_features'],
+                self.config.HIDDEN_CHANNELS,
+                self.stats['num_classes'],
+                num_layers=self.config.NUM_LAYERS,
+                dropout=self.config.DROPOUT
+            ),
+            'GAT': GAT(
+                self.stats['num_features'],
+                self.config.HIDDEN_CHANNELS,
+                self.stats['num_classes'],
+                num_layers=self.config.NUM_LAYERS,
+                heads=self.config.GAT_HEADS,
+                dropout=self.config.DROPOUT
+            ),
+            'ResGAT': ResGAT(
+                self.stats['num_features'],
+                self.config.HIDDEN_CHANNELS,
+                self.stats['num_classes'],
+                num_layers=self.config.NUM_LAYERS,
+                heads=self.config.GAT_HEADS,
+                dropout=self.config.DROPOUT,
+                residual=True
+            ),
             'MultiHopResGAT': MultiHopResGAT(
                 self.stats['num_features'],
                 self.config.HIDDEN_CHANNELS,
