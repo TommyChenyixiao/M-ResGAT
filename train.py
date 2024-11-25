@@ -585,7 +585,7 @@ class TransductiveTrainer:
 def main():
     """Main execution function"""
     # Available datasets
-    datasets = ['Cora_ML', 'CiteSeer']
+    datasets = ['Cora_ML', 'CiteSeer', 'Cora']
     
     for dataset_name in datasets:
         print(f"\nTraining on {dataset_name} dataset")
