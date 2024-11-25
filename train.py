@@ -15,9 +15,9 @@ from models.gcn import GCN
 from models.graphsage import GraphSAGE
 from models.gat import GAT
 from models.resgat import ResGAT
-from models.multihop_resgat import MultiHopResGAT
-from models.mgat import MGAT
-from models.multihop_mgat import MultiHopMGAT
+from models.mresgat import MultiHopResGAT
+from models.M_resgat import MGAT
+from models.M_mresgat import MultiHopMGAT
 from utils.metrics import evaluate, plot_roc_curves
 
 class Config:
@@ -240,27 +240,18 @@ class TransductiveTrainer:
             #     dropout=self.config.DROPOUT,
             #     residual=True
             # ),
-            # 'MultiHopResGAT': MultiHopResGAT(
-            #     self.stats['num_features'],
-            #     self.config.HIDDEN_CHANNELS,
-            #     self.stats['num_classes'],
-            #     num_layers=self.config.NUM_LAYERS,
-            #     heads=self.config.GAT_HEADS,
-            #     dropout=self.config.DROPOUT,
-            #     residual=True,
-            #     num_hops=self.config.NUM_HOPS,
-            #     combine=self.config.COMBINE_METHOD
-            # ),
-            # 'MGAT': MGAT(
-            # self.stats['num_features'],
-            # self.config.HIDDEN_CHANNELS,
-            # self.stats['num_classes'],
-            # num_layers=self.config.NUM_LAYERS,
-            # heads=self.config.GAT_HEADS,
-            # dropout=self.config.DROPOUT,
-            # beta=self.config.MGAT_BETA
-            # ),
-            'MultiHopMGAT': MultiHopMGAT(
+            'MultiHopResGAT': MultiHopResGAT(
+                self.stats['num_features'],
+                self.config.HIDDEN_CHANNELS,
+                self.stats['num_classes'],
+                num_layers=self.config.NUM_LAYERS,
+                heads=self.config.GAT_HEADS,
+                dropout=self.config.DROPOUT,
+                residual=True,
+                num_hops=self.config.NUM_HOPS,
+                combine=self.config.COMBINE_METHOD
+            ),
+            'M-resGAT': MGAT(
             self.stats['num_features'],
             self.config.HIDDEN_CHANNELS,
             self.stats['num_classes'],
@@ -268,7 +259,18 @@ class TransductiveTrainer:
             heads=self.config.GAT_HEADS,
             dropout=self.config.DROPOUT,
             beta=self.config.MGAT_BETA,
-            num_hops=self.config.NUM_HOPS
+            residual=True
+            ),
+            'MultiHopM-ResGAT': MultiHopMGAT(
+            self.stats['num_features'],
+            self.config.HIDDEN_CHANNELS,
+            self.stats['num_classes'],
+            num_layers=self.config.NUM_LAYERS,
+            heads=self.config.GAT_HEADS,
+            dropout=self.config.DROPOUT,
+            beta=self.config.MGAT_BETA,
+            num_hops=self.config.NUM_HOPS,
+            residual=True
             )
         }
         
@@ -335,6 +337,7 @@ class TransductiveTrainer:
             'train_acc': [],
             'val_acc': [],
             'val_f1': [],
+            'val_auc': [],  # Add AUC tracking
             'learning_rates': []
         }
         
@@ -345,15 +348,19 @@ class TransductiveTrainer:
             train_loss, train_acc = self._train_epoch(model, optimizer)
             scheduler.step()
             
-            # Validation
-            val_acc, val_f1 = self._evaluate(model, self.data.val_mask)
+            # Validation with ROC
+            val_acc, val_f1, val_roc_data = evaluate(
+                model, self.data, self.data.val_mask, return_roc=True
+            )
+            val_auc = val_roc_data['roc_auc']['macro']
             
-            # Store metrics
-            history['train_loss'].append(train_loss)
-            history['train_acc'].append(train_acc)
-            history['val_acc'].append(val_acc)
-            history['val_f1'].append(val_f1)
-            history['learning_rates'].append(scheduler.get_last_lr()[0])
+            # Store metrics (avoid storing non-serializable ROC data)
+            history['train_loss'].append(float(train_loss))  # Convert to Python float
+            history['train_acc'].append(float(train_acc))
+            history['val_acc'].append(float(val_acc))
+            history['val_f1'].append(float(val_f1))
+            history['val_auc'].append(float(val_auc))
+            history['learning_rates'].append(float(scheduler.get_last_lr()[0]))
             
             # Early stopping check
             if val_acc > best_val_acc + self.config.MIN_IMPROVEMENT:
@@ -367,27 +374,39 @@ class TransductiveTrainer:
                 print(f"Early stopping at epoch {epoch}")
                 break
             
-            if (epoch + 1) % 5 == 0:
+            if (epoch + 1) % 50 == 0:
                 print(f"Epoch {epoch+1:03d}: "
-                      f"Loss = {train_loss:.4f}, "
-                      f"Train Acc = {train_acc:.4f}, "
-                      f"Val Acc = {val_acc:.4f}")
+                    f"Loss = {train_loss:.4f}, "
+                    f"Train Acc = {train_acc:.4f}, "
+                    f"Val Acc = {val_acc:.4f}, "
+                    f"Val AUC = {val_auc:.4f}")
         
         training_time = time.time() - start_time
         
         # Evaluate best model
         model.load_state_dict(best_model_state)
-        test_acc, test_f1 = self._evaluate(model, self.data.test_mask)
+        test_acc, test_f1, test_roc_data = evaluate(
+            model, self.data, self.data.test_mask, return_roc=True
+        )
+        test_auc = test_roc_data['roc_auc']['macro']
         
         metrics = {
             'training_time': training_time,
             'epochs': epoch + 1,
             'best_val_acc': best_val_acc,
             'test_acc': test_acc,
-            'test_f1': test_f1
+            'test_f1': test_f1,
+            'test_auc': test_auc
         }
         
-        # Save results
+        # Store ROC curves
+        plot_roc_curves(
+            test_roc_data,
+            model_name,
+            os.path.join(self.config.OUTPUT_DIR, 'plots', f'{model_name}_roc.png')
+        )
+        
+        # Save results (without ROC data)
         self._save_results(model, model_name, history, metrics)
         
         return history, metrics
@@ -460,27 +479,45 @@ class TransductiveTrainer:
         
     def _plot_model_comparison(self, results):
         """Plot comparison of model performances"""
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 12))
         
+        # Accuracy comparison
         for model_name, result in results.items():
             history = result['history']
             ax1.plot(history['train_acc'], label=f'{model_name} (Train)')
             ax1.plot(history['val_acc'], label=f'{model_name} (Val)')
-        
         ax1.set_title('Accuracy Comparison')
         ax1.set_xlabel('Epoch')
         ax1.set_ylabel('Accuracy')
         ax1.legend()
         ax1.grid(True)
         
+        # F1 Score comparison
         for model_name, result in results.items():
             ax2.plot(result['history']['val_f1'], label=model_name)
-        
-        ax2.set_title('Validation F1 Score Comparison')
+        ax2.set_title('Validation F1 Score')
         ax2.set_xlabel('Epoch')
         ax2.set_ylabel('F1 Score')
         ax2.legend()
         ax2.grid(True)
+        
+        # AUC comparison
+        for model_name, result in results.items():
+            ax3.plot(result['history']['val_auc'], label=model_name)
+        ax3.set_title('Validation Macro AUC')
+        ax3.set_xlabel('Epoch')
+        ax3.set_ylabel('AUC')
+        ax3.legend()
+        ax3.grid(True)
+        
+        # Learning rate
+        for model_name, result in results.items():
+            ax4.plot(result['history']['learning_rates'], label=model_name)
+        ax4.set_title('Learning Rate')
+        ax4.set_xlabel('Epoch')
+        ax4.set_ylabel('Learning Rate')
+        ax4.legend()
+        ax4.grid(True)
         
         plt.tight_layout()
         plt.savefig(os.path.join(self.config.OUTPUT_DIR, 'plots', 'model_comparison.png'))
@@ -489,45 +526,52 @@ class TransductiveTrainer:
     def _print_final_results(self, results):
         """Print final comparison results"""
         print("\nFinal Results:")
-        print("=" * 100)
-        print(f"{'Model':<15} {'Train Acc':<10} {'Val Acc':<10} {'Test Acc':<10} {'Test F1':<10} {'Time(s)':<10} {'Epochs'}")
-        print("-" * 100)
+        print("=" * 120)
+        print(f"{'Model':<15} {'Train Acc':<10} {'Val Acc':<10} {'Test Acc':<10} "
+            f"{'Test F1':<10} {'Test AUC':<10} {'Time(s)':<10} {'Epochs'}")
+        print("-" * 120)
         
         for model_name, result in results.items():
             metrics = result['metrics']
             history = result['history']
             
             print(f"{model_name:<15} "
-                  f"{max(history['train_acc']):.4f}    "
-                  f"{metrics['best_val_acc']:.4f}    "
-                  f"{metrics['test_acc']:.4f}    "
-                  f"{metrics['test_f1']:.4f}    "
-                  f"{metrics['training_time']:.1f}      "
-                  f"{metrics['epochs']}")
+                f"{max(history['train_acc']):.4f}    "
+                f"{metrics['best_val_acc']:.4f}    "
+                f"{metrics['test_acc']:.4f}    "
+                f"{metrics['test_f1']:.4f}    "
+                f"{metrics['test_auc']:.4f}    "
+                f"{metrics['training_time']:.1f}      "
+                f"{metrics['epochs']}")
         
         # Save results to file
         results_path = os.path.join(self.config.OUTPUT_DIR, 'results', 'final_results.txt')
         with open(results_path, 'w') as f:
             f.write("Final Results Summary\n")
-            f.write("=" * 100 + "\n")
-            f.write(f"{'Model':<15} {'Train Acc':<10} {'Val Acc':<10} {'Test Acc':<10} {'Test F1':<10} {'Time(s)':<10} {'Epochs'}\n")
-            f.write("-" * 100 + "\n")
+            f.write("=" * 120 + "\n")
+            headers = ['Model', 'Train Acc', 'Val Acc', 'Test Acc', 
+                    'Test F1', 'Test AUC', 'Time(s)', 'Epochs']
+            f.write(f"{headers[0]:<15} {headers[1]:<10} {headers[2]:<10} "
+                f"{headers[3]:<10} {headers[4]:<10} {headers[5]:<10} "
+                f"{headers[6]:<10} {headers[7]}\n")
+            f.write("-" * 120 + "\n")
             
             for model_name, result in results.items():
                 metrics = result['metrics']
                 history = result['history']
                 
                 f.write(f"{model_name:<15} "
-                       f"{max(history['train_acc']):.4f}    "
-                       f"{metrics['best_val_acc']:.4f}    "
-                       f"{metrics['test_acc']:.4f}    "
-                       f"{metrics['test_f1']:.4f}    "
-                       f"{metrics['training_time']:.1f}      "
-                       f"{metrics['epochs']}\n")
+                    f"{max(history['train_acc']):.4f}    "
+                    f"{metrics['best_val_acc']:.4f}    "
+                    f"{metrics['test_acc']:.4f}    "
+                    f"{metrics['test_f1']:.4f}    "
+                    f"{metrics['test_auc']:.4f}    "
+                    f"{metrics['training_time']:.1f}      "
+                    f"{metrics['epochs']}\n")
             
-            # Add additional statistics
+            # Add detailed statistics
             f.write("\nTraining Details:\n")
-            f.write("-" * 50 + "\n")
+            f.write("-" * 60 + "\n")
             for model_name, result in results.items():
                 metrics = result['metrics']
                 f.write(f"\n{model_name}:\n")
@@ -536,11 +580,12 @@ class TransductiveTrainer:
                 f.write(f"  Best Validation Accuracy: {metrics['best_val_acc']:.4f}\n")
                 f.write(f"  Final Test Accuracy: {metrics['test_acc']:.4f}\n")
                 f.write(f"  Final Test F1 Score: {metrics['test_f1']:.4f}\n")
+                f.write(f"  Final Test Macro AUC: {metrics['test_auc']:.4f}\n")
 
 def main():
     """Main execution function"""
     # Available datasets
-    datasets = ['Cora_ML']
+    datasets = ['Cora_ML', 'CiteSeer']
     
     for dataset_name in datasets:
         print(f"\nTraining on {dataset_name} dataset")

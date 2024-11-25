@@ -18,6 +18,7 @@ class MotifGATConv(MessagePassing):
         add_self_loops: bool = True,
         beta: float = 0.5,
         bias: bool = True,
+        residual: bool = True,
         **kwargs,
     ):
         super().__init__(node_dim=0, **kwargs)
@@ -30,6 +31,7 @@ class MotifGATConv(MessagePassing):
         self.negative_slope = negative_slope
         self.dropout = dropout
         self.add_self_loops = add_self_loops
+        self.residual = residual
 
         # Linear transformation for node features
         self.lin = Linear(in_channels, heads * out_channels, bias=False)
@@ -37,6 +39,11 @@ class MotifGATConv(MessagePassing):
         # Attention parameters
         self.att_src = Parameter(torch.empty(1, heads, out_channels))
         self.att_dst = Parameter(torch.empty(1, heads, out_channels))
+
+        # Residual connection
+        if residual:
+            self.res_linear = Linear(in_channels, heads * out_channels, bias=False) \
+                if in_channels != heads * out_channels else None
 
         if bias and concat:
             self.bias = Parameter(torch.empty(heads * out_channels))
@@ -53,6 +60,8 @@ class MotifGATConv(MessagePassing):
         glorot(self.att_src)
         glorot(self.att_dst)
         zeros(self.bias)
+        if self.residual and self.res_linear is not None:
+            glorot(self.res_linear.weight)
 
     def compute_motif_adj(self, edge_index, num_nodes):
         """Compute motif-based adjacency matrix."""
@@ -64,6 +73,9 @@ class MotifGATConv(MessagePassing):
 
     def forward(self, x, edge_index):
         num_nodes = x.size(0)
+        
+        # Store residual
+        residual = x
         
         # Linear transformation
         x = self.lin(x).view(-1, self.heads, self.out_channels)
@@ -95,6 +107,12 @@ class MotifGATConv(MessagePassing):
             out = out.view(-1, self.heads * self.out_channels)
         else:
             out = out.mean(dim=1)
+
+        # Add residual connection
+        if self.residual:
+            if self.res_linear is not None:
+                residual = self.res_linear(residual)
+            out = out + residual
 
         if self.bias is not None:
             out += self.bias
@@ -143,7 +161,8 @@ class MGAT(torch.nn.Module):
         num_layers: int = 2,
         heads: int = 8,
         dropout: float = 0.6,
-        beta: float = 0.5
+        beta: float = 0.5,
+        residual: bool = True
     ):
         super().__init__()
 
@@ -156,7 +175,8 @@ class MGAT(torch.nn.Module):
                 hidden_channels,
                 heads=heads,
                 dropout=dropout,
-                beta=beta
+                beta=beta,
+                residual=False  # No residual for first layer
             )
         )
         
@@ -168,7 +188,8 @@ class MGAT(torch.nn.Module):
                     hidden_channels,
                     heads=heads,
                     dropout=dropout,
-                    beta=beta
+                    beta=beta,
+                    residual=residual
                 )
             )
         
@@ -180,7 +201,8 @@ class MGAT(torch.nn.Module):
                 heads=1,
                 concat=False,
                 dropout=dropout,
-                beta=beta
+                beta=beta,
+                residual=residual
             )
         )
 
