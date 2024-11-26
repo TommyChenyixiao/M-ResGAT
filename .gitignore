@@ -9,10 +9,10 @@ __pycache__/
 # Large Dataset
 *.DS_Store
 # model log & checkpoint
-cora_ml/
-outputs/
 *.json
 *.sh
+*.out
+*.pt
 
 # Distribution / packaging
 .Python

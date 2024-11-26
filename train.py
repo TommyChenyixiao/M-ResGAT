@@ -29,13 +29,13 @@ class Config:
     NUM_HOPS = 2
     COMBINE_METHOD = 'attention'  # ['concat', 'sum', 'attention']
     EPOCHS = 1000
-    PATIENCE = 100
+    PATIENCE = 50
     MIN_IMPROVEMENT = 1e-4
     
     # Dataset settings
     DATASET_CONFIGS = {
         'Cora_ML': {
-            'hidden_channels': 256,
+            'hidden_channels': 128,
             'dropout': 0.3,
             'learning_rate': 0.001,
             'weight_decay': 1e-4,
@@ -46,7 +46,7 @@ class Config:
             'beta': 0.5  # Balance between first-order and motif attention
         },
         'Cora': {
-            'hidden_channels': 256,
+            'hidden_channels': 64,
             'dropout': 0.3,
             'learning_rate': 0.001,
             'weight_decay': 1e-4,
@@ -57,7 +57,7 @@ class Config:
             'beta': 0.5
         },
         'CiteSeer': {
-            'hidden_channels': 256,
+            'hidden_channels': 128,
             'dropout': 0.3,
             'learning_rate': 0.001,
             'weight_decay': 1e-4,
@@ -260,18 +260,18 @@ class TransductiveTrainer:
             dropout=self.config.DROPOUT,
             beta=self.config.MGAT_BETA,
             residual=True
-            ),
-            'MultiHopM-ResGAT': MultiHopMGAT(
-            self.stats['num_features'],
-            self.config.HIDDEN_CHANNELS,
-            self.stats['num_classes'],
-            num_layers=self.config.NUM_LAYERS,
-            heads=self.config.GAT_HEADS,
-            dropout=self.config.DROPOUT,
-            beta=self.config.MGAT_BETA,
-            num_hops=self.config.NUM_HOPS,
-            residual=True
             )
+            # 'MultiHopM-ResGAT': MultiHopMGAT(
+            # self.stats['num_features'],
+            # self.config.HIDDEN_CHANNELS,
+            # self.stats['num_classes'],
+            # num_layers=self.config.NUM_LAYERS,
+            # heads=self.config.GAT_HEADS,
+            # dropout=self.config.DROPOUT,
+            # beta=self.config.MGAT_BETA,
+            # num_hops=self.config.NUM_HOPS,
+            # residual=True
+            # )
         }
         
         # Move models to device
@@ -585,7 +585,7 @@ class TransductiveTrainer:
 def main():
     """Main execution function"""
     # Available datasets
-    datasets = ['Cora_ML', 'CiteSeer', 'Cora']
+    datasets = ['Cora']
     
     for dataset_name in datasets:
         print(f"\nTraining on {dataset_name} dataset")
