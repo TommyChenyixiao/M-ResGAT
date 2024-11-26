@@ -90,8 +90,7 @@ M-ResGAT/
 │   ├── gat.py
 │   ├── resgat.py
 │   ├── mresgat.py
-│   ├── M_resgat.py
-│   └── M_mresgat.py
+│   └── M_resgat.py
 ├── utils/
 │   ├── __init__.py
 │   ├── metrics.py
