@@ -28,7 +28,7 @@ class Config:
     # Common model parameters
     NUM_HOPS = 2
     COMBINE_METHOD = 'attention'  # ['concat', 'sum', 'attention']
-    EPOCHS = 1000
+    EPOCHS = 2000
     PATIENCE = 50
     MIN_IMPROVEMENT = 1e-4
     
@@ -261,17 +261,6 @@ class TransductiveTrainer:
             beta=self.config.MGAT_BETA,
             residual=True
             )
-            # 'MultiHopM-ResGAT': MultiHopMGAT(
-            # self.stats['num_features'],
-            # self.config.HIDDEN_CHANNELS,
-            # self.stats['num_classes'],
-            # num_layers=self.config.NUM_LAYERS,
-            # heads=self.config.GAT_HEADS,
-            # dropout=self.config.DROPOUT,
-            # beta=self.config.MGAT_BETA,
-            # num_hops=self.config.NUM_HOPS,
-            # residual=True
-            # )
         }
         
         # Move models to device
