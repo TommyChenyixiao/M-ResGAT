@@ -534,6 +534,9 @@ class TransductiveTrainer:
                 f"{metrics['epochs']}")
         
         # Save results to file
+        finished_time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')  # Format: YYYY-MM-DD_HH-MM-SS
+        results_filename = f"final_results_{finished_time}.txt"
+        results_path = os.path.join(self.config.OUTPUT_DIR, 'results', results_filename)
         results_path = os.path.join(self.config.OUTPUT_DIR, 'results', 'final_results.txt')
         with open(results_path, 'w') as f:
             f.write("Final Results Summary\n")
@@ -574,7 +577,7 @@ class TransductiveTrainer:
 def main():
     """Main execution function"""
     # Available datasets
-    datasets = ['Cora']
+    datasets = ['Cora_ML', 'CiteSeer', 'Cora']
     
     for dataset_name in datasets:
         print(f"\nTraining on {dataset_name} dataset")
