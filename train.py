@@ -17,7 +17,6 @@ from models.gat import GAT
 from models.resgat import ResGAT
 from models.mresgat import MultiHopResGAT
 from models.M_resgat import MGAT
-from models.M_mresgat import MultiHopMGAT
 from utils.metrics import evaluate, plot_roc_curves
 
 class Config:
