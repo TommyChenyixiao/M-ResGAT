@@ -5,7 +5,6 @@ This repository contains the implementation of M-ResGAT, a novel graph neural ne
 ## Overview
 
 M-ResGAT extends the traditional Graph Attention Network (GAT) by incorporating:
-- Multi-hop attention mechanisms to capture broader network context
 - Motif-based structural patterns for enhanced graph representation
 - Residual connections for better gradient flow
 - Hybrid information matrices combining first-order and higher-order relationships
