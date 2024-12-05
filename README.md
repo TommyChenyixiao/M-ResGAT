@@ -1,35 +1,42 @@
 # M-ResGAT: Multi-hop Motif-based Residual Graph Attention Networks
 
-This repository contains the implementation of M-ResGAT, a novel graph neural network architecture that enhances ResGAT with multi-hop attention mechanisms and motif-based structural information for improved node classification in citation networks.
+**M-ResGAT** is a novel Graph Neural Network (GNN) architecture that extends Residual Graph Attention Networks (ResGAT) with multi-hop attention mechanisms and motif-based structural information to improve node classification performance in citation networks.
 
-## Overview
+---
 
-M-ResGAT extends the traditional Graph Attention Network (GAT) by incorporating:
-- Motif-based structural patterns for enhanced graph representation
-- Residual connections for better gradient flow
-- Hybrid information matrices combining first-order and higher-order relationships
+## 🚀 **Features**
+- **Motif-based Patterns:** Integrates higher-order graph structures for enhanced representation.
+- **Residual Connections:** Ensures better gradient flow and stability.
+- **Hybrid Information Matrices:** Combines first-order and higher-order relationships.
 
-## Model Architecture
+---
 
-The key components of our architecture include:
-- Motif-based hybrid information integration
-- Residual connections with layer normalization
+## 📂 **Repository Structure**
 
-## Requirements
-
-```bash
-# Core dependencies
-torch>=1.9.0
-torch-geometric>=2.0.0
-torch-scatter>=2.0.9
-torch-sparse>=0.6.12
-numpy>=1.21.0
-scikit-learn>=0.24.2
-matplotlib>=3.4.3
-PyYAML>=5.1
+```
+M-ResGAT/
+├── data/
+│   ├── __init__.py
+│   └── dataset.py
+├── models/
+│   ├── __init__.py
+│   ├── gcn.py
+│   ├── graphsage.py
+│   ├── gat.py
+│   ├── resgat.py
+│   ├── mresgat.py
+│   └── M_resgat.py
+├── utils/
+│   ├── __init__.py
+│   ├── metrics.py
+│   ├── visualization.py
+├── requirements.txt
+└── train.py
 ```
 
-## Installation
+---
+
+## 🔧 **Installation**
 
 ```bash
 # Clone the repository
@@ -44,7 +51,9 @@ conda activate resgat
 pip install -r requirements.txt
 ```
 
-## Usage
+---
+
+## 🧑‍💻 **Usage**
 
 ### Training
 
@@ -68,37 +77,19 @@ Modify `config` in train.py to adjust model parameters:
 - Multi-hop settings (number of hops, combination method)
 - Motif attention parameters (beta coefficient)
 
-## Project Structure
+---
 
-```
-M-ResGAT/
-├── data/
-│   ├── __init__.py
-│   └── dataset.py
-├── models/
-│   ├── __init__.py
-│   ├── gcn.py
-│   ├── graphsage.py
-│   ├── gat.py
-│   ├── resgat.py
-│   ├── mresgat.py
-│   └── M_resgat.py
-├── utils/
-│   ├── __init__.py
-│   ├── metrics.py
-│   ├── visualization.py
-├── requirements.txt
-└── train.py
-```
 
-## Evaluation Metrics
+## 📊 **Evaluation Metrics**
 
 The model's performance is evaluated using:
 - Classification Accuracy
 - Macro F1-Score
 - Node Classification AUC
 
-## Results
+---
+
+## 🎯 **Results**
 
 ### Performance on Cora-ML
 
@@ -135,7 +126,9 @@ The model's performance is evaluated using:
 
 Our experimental results highlight distinct performance patterns across different evaluation metrics. On Cora-ML, M-ResGAT achieves competitive test accuracy (87.00\%) and the highest AUC score (98.68\%), while matching GraphSAGE's strong F1 performance (86.42\%). For CiteSeer, MultiHop-ResGAT demonstrates superior performance with the highest test accuracy (96.11\%) and F1 score (96.31\%), though GCN achieves the best AUC score (99.71\%). On the more challenging Cora dataset, MultiHop-ResGAT leads in both test accuracy (69.07\%) and F1 score (64.00\%), while M-ResGAT achieves the highest AUC (97.31\%). These results suggest that MultiHop-ResGAT's explicit multi-hop attention mechanism is particularly effective for capturing complex node relationships in denser networks like CiteSeer, whereas M-ResGAT's motif-based approach excels at identifying broader class-specific patterns, as evidenced by its strong AUC performance across all datasets.
 
-## Citation
+---
+
+## 📘 **Citation**
 - Veličković, Petar, Cucurull, Guillem, Casanova, Arantxa, Romero, Adriana, Liò, Pietro, & Bengio, Yoshua. (2017). [Graph Attention Networks](https://doi.org/10.48550/arXiv.1710.10903). *arXiv*. doi:10.48550/arXiv.1710.10903.
 
 - Debackere, Wolfgang, & Glänzel, Koenraad. (2022). [Various aspects of interdisciplinarity in research and how to quantify and measure those](https://ideas.repec.org/a/spr/scient/v127y2022i9d10.1007_s11192-021-04133-4.html). *Scientometrics*, 127(9), 5551–5569. doi:10.1007/s11192-021-04133-4.
@@ -182,7 +175,8 @@ Our experimental results highlight distinct performance patterns across differen
 
 - Peng, Hao, Li, Jianxin, Gong, Qiran, Wang, Senzhang, Ning, Yuanxing, & Yu, Philip S. (2018). [Graph Convolutional Neural Networks via Motif-based Attention](https://doi.org/10.48550/arXiv.1811.08270). *arXiv*. doi:10.48550/arXiv.1811.08270.
 
+---
 
-## License
+## 📝 **License**
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
