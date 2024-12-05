@@ -2,18 +2,18 @@ Final Results Summary
 ========================================================================================================================
 Model           Train Acc  Val Acc    Test Acc   Test F1    Test AUC   Time(s)    Epochs
 ------------------------------------------------------------------------------------------------------------------------
-GCN             0.6732    0.6626    0.6391    0.5138    0.9690    121.7      1000
-GraphSAGE       0.8233    0.7066    0.6834    0.6331    0.9710    165.1      1000
-GAT             0.7863    0.7158    0.6873    0.6344    0.9726    129.9      807
-ResGAT          0.8455    0.7276    0.6878    0.6337    0.9588    31.8      239
-MultiHopResGAT  0.8419    0.7286    0.6928    0.6418    0.9628    35.2      234
-M-resGAT        0.8650    0.7209    0.6854    0.6347    0.9730    5249.5      507
+GCN             0.6732    0.6626    0.6391    0.5138    0.9690    117.7      1000
+GraphSAGE       0.8233    0.7061    0.6829    0.6328    0.9710    162.4      1000
+GAT             0.7944    0.7158    0.6893    0.6381    0.9720    142.1      902
+ResGAT          0.8477    0.7281    0.6829    0.6297    0.9568    29.5      227
+MultiHopResGAT  0.8440    0.7271    0.6923    0.6393    0.9612    34.8      240
+M-resGAT        0.8697    0.7179    0.6844    0.6310    0.9727    5252.4      512
 
 Training Details:
 ------------------------------------------------------------
 
 GCN:
-  Training Time: 121.69 seconds
+  Training Time: 117.74 seconds
   Total Epochs: 1000
   Best Validation Accuracy: 0.6626
   Final Test Accuracy: 0.6391
@@ -21,41 +21,41 @@ GCN:
   Final Test Macro AUC: 0.9690
 
 GraphSAGE:
-  Training Time: 165.10 seconds
+  Training Time: 162.37 seconds
   Total Epochs: 1000
-  Best Validation Accuracy: 0.7066
-  Final Test Accuracy: 0.6834
-  Final Test F1 Score: 0.6331
+  Best Validation Accuracy: 0.7061
+  Final Test Accuracy: 0.6829
+  Final Test F1 Score: 0.6328
   Final Test Macro AUC: 0.9710
 
 GAT:
-  Training Time: 129.94 seconds
-  Total Epochs: 807
+  Training Time: 142.07 seconds
+  Total Epochs: 902
   Best Validation Accuracy: 0.7158
-  Final Test Accuracy: 0.6873
-  Final Test F1 Score: 0.6344
-  Final Test Macro AUC: 0.9726
+  Final Test Accuracy: 0.6893
+  Final Test F1 Score: 0.6381
+  Final Test Macro AUC: 0.9720
 
 ResGAT:
-  Training Time: 31.79 seconds
-  Total Epochs: 239
-  Best Validation Accuracy: 0.7276
-  Final Test Accuracy: 0.6878
-  Final Test F1 Score: 0.6337
-  Final Test Macro AUC: 0.9588
+  Training Time: 29.50 seconds
+  Total Epochs: 227
+  Best Validation Accuracy: 0.7281
+  Final Test Accuracy: 0.6829
+  Final Test F1 Score: 0.6297
+  Final Test Macro AUC: 0.9568
 
 MultiHopResGAT:
-  Training Time: 35.21 seconds
-  Total Epochs: 234
-  Best Validation Accuracy: 0.7286
-  Final Test Accuracy: 0.6928
-  Final Test F1 Score: 0.6418
-  Final Test Macro AUC: 0.9628
+  Training Time: 34.81 seconds
+  Total Epochs: 240
+  Best Validation Accuracy: 0.7271
+  Final Test Accuracy: 0.6923
+  Final Test F1 Score: 0.6393
+  Final Test Macro AUC: 0.9612
 
 M-resGAT:
-  Training Time: 5249.53 seconds
-  Total Epochs: 507
-  Best Validation Accuracy: 0.7209
-  Final Test Accuracy: 0.6854
-  Final Test F1 Score: 0.6347
-  Final Test Macro AUC: 0.9730
+  Training Time: 5252.36 seconds
+  Total Epochs: 512
+  Best Validation Accuracy: 0.7179
+  Final Test Accuracy: 0.6844
+  Final Test F1 Score: 0.6310
+  Final Test Macro AUC: 0.9727
