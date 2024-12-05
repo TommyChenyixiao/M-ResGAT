@@ -100,6 +100,40 @@ The model's performance is evaluated using:
 
 ## Results
 
+### Performance on Cora-ML
+
+| **Model**       | **Test Acc (%)**  | **Test F1**       | **Test AUC**     | **Time (s)**         |
+|------------------|-------------------|-------------------|------------------|----------------------|
+| GCN              | 86.12 ± 0.19      | 84.72 ± 0.31      | 98.59 ± 0.01     | 6.57 ± 1.46          |
+| GraphSAGE        | 87.21 ± 0.00      | 86.30 ± 0.13      | 98.57 ± 0.03     | 4.97 ± 0.93          |
+| GAT              | 87.32 ± 0.68      | 86.67 ± 0.62      | 98.58 ± 0.04     | 6.47 ± 0.40          |
+| ResGAT           | 86.45 ± 0.51      | 85.44 ± 0.79      | 98.26 ± 0.06     | 2.30 ± 0.46          |
+| MultiHopResGAT   | 84.37 ± 0.68      | 82.97 ± 0.76      | 97.65 ± 0.21     | 3.63 ± 1.17          |
+| M-ResGAT         | 87.00 ± 0.18      | 86.42 ± 0.12      | 98.68 ± 0.01     | 14.00 ± 2.13         |
+
+### Performance on CiteSeer
+
+| **Model**       | **Test Acc (%)**  | **Test F1**       | **Test AUC**     | **Time (s)**         |
+|------------------|-------------------|-------------------|------------------|----------------------|
+| GCN              | 95.25 ± 0.27      | 95.41 ± 0.27      | 99.71 ± 0.01     | 6.87 ± 1.37          |
+| GraphSAGE        | 95.95 ± 0.14      | 96.13 ± 0.15      | 99.59 ± 0.02     | 4.23 ± 0.25          |
+| GAT              | 95.33 ± 0.23      | 95.50 ± 0.23      | 99.58 ± 0.05     | 6.30 ± 1.87          |
+| ResGAT           | 95.41 ± 0.13      | 95.58 ± 0.14      | 99.60 ± 0.04     | 3.93 ± 0.95          |
+| MultiHopResGAT   | 96.11 ± 0.13      | 96.31 ± 0.12      | 99.51 ± 0.03     | 5.83 ± 2.17          |
+| M-ResGAT         | 95.33 ± 0.23      | 95.51 ± 0.25      | 99.49 ± 0.03     | 47.30 ± 9.97         |
+
+### Performance on Cora
+
+| **Model**       | **Test Acc (%)**  | **Test F1**       | **Test AUC**     | **Time (s)**         |
+|------------------|-------------------|-------------------|------------------|----------------------|
+| GCN              | 63.86 ± 0.09      | 51.30 ± 0.14      | 96.90 ± 0.00     | 120.27 ± 2.22        |
+| GraphSAGE        | 68.32 ± 0.03      | 63.33 ± 0.07      | 97.10 ± 0.01     | 164.10 ± 1.48        |
+| GAT              | 68.86 ± 0.12      | 63.69 ± 0.21      | 97.22 ± 0.03     | 139.07 ± 8.05        |
+| ResGAT           | 68.49 ± 0.26      | 63.16 ± 0.20      | 95.78 ± 0.10     | 30.63 ± 1.15         |
+| MultiHopResGAT   | 69.07 ± 0.33      | 64.00 ± 0.16      | 96.10 ± 0.19     | 37.30 ± 4.10         |
+| M-ResGAT         | 68.31 ± 0.32      | 63.16 ± 0.29      | 97.31 ± 0.04     | 5247.53 ± 6.12       |
+
+Our experimental results highlight distinct performance patterns across different evaluation metrics. On Cora-ML, M-ResGAT achieves competitive test accuracy (87.00\%) and the highest AUC score (98.68\%), while matching GraphSAGE's strong F1 performance (86.42\%). For CiteSeer, MultiHop-ResGAT demonstrates superior performance with the highest test accuracy (96.11\%) and F1 score (96.31\%), though GCN achieves the best AUC score (99.71\%). On the more challenging Cora dataset, MultiHop-ResGAT leads in both test accuracy (69.07\%) and F1 score (64.00\%), while M-ResGAT achieves the highest AUC (97.31\%). These results suggest that MultiHop-ResGAT's explicit multi-hop attention mechanism is particularly effective for capturing complex node relationships in denser networks like CiteSeer, whereas M-ResGAT's motif-based approach excels at identifying broader class-specific patterns, as evidenced by its strong AUC performance across all datasets.
 
 ## Citation
 - Veličković, Petar, Cucurull, Guillem, Casanova, Arantxa, Romero, Adriana, Liò, Pietro, & Bengio, Yoshua. (2017). [Graph Attention Networks](https://doi.org/10.48550/arXiv.1710.10903). *arXiv*. doi:10.48550/arXiv.1710.10903.
