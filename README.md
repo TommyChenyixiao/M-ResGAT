@@ -32,8 +32,6 @@ M-ResGAT/
 └── train.py
 ```
 
----
-
 ## 🔧 **Installation**
 
 ```bash
@@ -49,7 +47,6 @@ conda activate resgat
 pip install -r requirements.txt
 ```
 
----
 
 ## 🧑‍💻 **Usage**
 
@@ -75,7 +72,6 @@ Modify `config` in train.py to adjust model parameters:
 - Multi-hop settings (number of hops, combination method)
 - Motif attention parameters (beta coefficient)
 
----
 
 
 ## 📊 **Evaluation Metrics**
@@ -85,7 +81,6 @@ The model's performance is evaluated using:
 - Macro F1-Score
 - Node Classification AUC
 
----
 
 ## 🎯 **Results**
 
@@ -124,7 +119,6 @@ The model's performance is evaluated using:
 
 Our experimental results highlight distinct performance patterns across different evaluation metrics. On Cora-ML, M-ResGAT achieves competitive test accuracy (87.00\%) and the highest AUC score (98.68\%), while matching GraphSAGE's strong F1 performance (86.42\%). For CiteSeer, MultiHop-ResGAT demonstrates superior performance with the highest test accuracy (96.11\%) and F1 score (96.31\%), though GCN achieves the best AUC score (99.71\%). On the more challenging Cora dataset, MultiHop-ResGAT leads in both test accuracy (69.07\%) and F1 score (64.00\%), while M-ResGAT achieves the highest AUC (97.31\%). These results suggest that MultiHop-ResGAT's explicit multi-hop attention mechanism is particularly effective for capturing complex node relationships in denser networks like CiteSeer, whereas M-ResGAT's motif-based approach excels at identifying broader class-specific patterns, as evidenced by its strong AUC performance across all datasets.
 
----
 
 ## 📘 **Citation**
 - Veličković, Petar, Cucurull, Guillem, Casanova, Arantxa, Romero, Adriana, Liò, Pietro, & Bengio, Yoshua. (2017). [Graph Attention Networks](https://doi.org/10.48550/arXiv.1710.10903). *arXiv*. doi:10.48550/arXiv.1710.10903.
@@ -173,7 +167,6 @@ Our experimental results highlight distinct performance patterns across differen
 
 - Peng, Hao, Li, Jianxin, Gong, Qiran, Wang, Senzhang, Ning, Yuanxing, & Yu, Philip S. (2018). [Graph Convolutional Neural Networks via Motif-based Attention](https://doi.org/10.48550/arXiv.1811.08270). *arXiv*. doi:10.48550/arXiv.1811.08270.
 
----
 
 ## 📝 **License**
 
