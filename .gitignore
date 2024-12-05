@@ -13,6 +13,7 @@ __pycache__/
 *.sh
 *.out
 *.pt
+results/
 
 # Distribution / packaging
 .Python
