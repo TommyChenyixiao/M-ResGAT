@@ -119,10 +119,15 @@ The model's performance is evaluated using:
 
 Our experimental results highlight distinct performance patterns across different evaluation metrics. On Cora-ML, M-ResGAT achieves competitive test accuracy (87.00\%) and the highest AUC score (98.68\%), while matching GraphSAGE's strong F1 performance (86.42\%). For CiteSeer, MultiHop-ResGAT demonstrates superior performance with the highest test accuracy (96.11\%) and F1 score (96.31\%), though GCN achieves the best AUC score (99.71\%). On the more challenging Cora dataset, MultiHop-ResGAT leads in both test accuracy (69.07\%) and F1 score (64.00\%), while M-ResGAT achieves the highest AUC (97.31\%). These results suggest that MultiHop-ResGAT's explicit multi-hop attention mechanism is particularly effective for capturing complex node relationships in denser networks like CiteSeer, whereas M-ResGAT's motif-based approach excels at identifying broader class-specific patterns, as evidenced by its strong AUC performance across all datasets.
 
-### Training Dynamics
-![Model Comparison for CORA_ML](outputs/cora_ml/plots/model_comparison.png) 
+### Training Dynamics on Cora-ML
+![Model Comparison for CORA_ML](outputs/cora_ml/plots/model_comparison.png)
+
+### Training Dynamics on CiteSeer
 ![Model Comparison for CiteSeer](outputs/citeseer/plots/model_comparison.png) 
+
+### Training Dynamics on Cora
 ![Model Comparison for CORA](outputs/cora/plots/model_comparison.png) 
+
 Both M-ResGAT and MultiHop-ResGAT demonstrate faster convergence compared to baseline models, suggesting that incorporating higher-order structural information accelerates learning across three different datasets.
 
 
