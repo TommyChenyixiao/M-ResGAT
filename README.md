@@ -2,14 +2,12 @@
 
 **M-ResGAT** is a novel Graph Neural Network (GNN) architecture that extends Residual Graph Attention Networks (ResGAT) with multi-hop attention mechanisms and motif-based structural information to improve node classification performance in citation networks.
 
----
 
 ## 🚀 **Features**
 - **Motif-based Patterns:** Integrates higher-order graph structures for enhanced representation.
 - **Residual Connections:** Ensures better gradient flow and stability.
 - **Hybrid Information Matrices:** Combines first-order and higher-order relationships.
 
----
 
 ## 📂 **Repository Structure**
 
